@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <title>Διαχείριση - Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="admin-wrapper">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h3>Admin Panel</h3>
+            </div>
+            <ul class="list-unstyled components">
+                <li><a href="{{ url_for('admin_dashboard') }}">📊 Dashboard</a></li>
+                <li><a href="{{ url_for('admin_products') }}" style="background: #34495e;">🍔 Προϊόντα</a></li>
+                <li><a href="{{ url_for('admin_orders') }}">📦 Παραγγελίες</a></li>
+                <li><a href="{{ url_for('index') }}">🏠 Επιστροφή στο Site</a></li>
+                <li><a href="{{ url_for('logout') }}">🚪 Έξοδος</a></li>
+            </ul>
+        </nav>
+
+        <div class="content">
+            <h2>Καλωσήρθατε, Διαχειριστή!</h2>
+            <p>Επιλέξτε μια ενέργεια από το μενού.</p>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Προϊόντα</h3>
+                    <p class="number" style="color: #3498db;">{{ product_count }}</p>
+                    <small>Ενεργά στο μενού</small>
+                </div>
+                
+                <div class="stat-card">
+                    <h3>Παραγγελίες</h3>
+                    <p class="number" style="color: #e67e22;">{{ order_count }}</p>
+                    <small>Συνολικές λήψεις</small>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Έσοδα</h3>
+                    <p class="number" style="color: #27ae60;">{{ total_revenue }} €</p>
+                    <small>Συνολικός τζίρος</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

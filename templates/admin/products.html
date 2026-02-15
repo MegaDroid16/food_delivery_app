@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <title>Διαχείριση Προϊόντων</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="admin-wrapper">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h3>Admin Panel</h3>
+            </div>
+            <ul>
+                <li><a href="{{ url_for('admin_dashboard') }}">📊 Dashboard</a></li>
+                <li><a href="{{ url_for('admin_products') }}" style="background: #34495e;">🍔 Προϊόντα</a></li>
+                <li><a href="{{ url_for('admin_orders') }}">📦 Παραγγελίες</a></li>
+                <li><a href="{{ url_for('index') }}">🏠 Επιστροφή στο Site</a></li>
+                <li><a href="{{ url_for('logout') }}">🚪 Έξοδος</a></li>
+            </ul>
+        </nav>
+
+        <div class="content">
+            <h2>🍔 Διαχείριση Προϊόντων</h2>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div style="padding: 10px; background: #d4edda; color: #155724; margin-bottom: 20px; border-radius: 5px;">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="products-layout">
+                <div class="card admin-form" style="background: white; padding: 20px; border-radius: 8px; height: fit-content;">
+                    <h3>➕ Νέο Προϊόν</h3>
+                    <form action="{{ url_for('admin_products') }}" method="POST" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label>Όνομα</label>
+                            <input type="text" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Κατηγορία</label>
+                            <select name="category" style="width: 100%; padding: 10px;">
+                                <option value="Pizza">Pizza🍕</option>
+                                <option value="Burgers">Burgers🍔</option>
+                                <option value="Salads">Salads🥗</option>
+                                <option value="Drinks">Drinks🍻</option>
+                                <option value="Snacks">Snacks🍟</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Περιγραφή</label>
+                            <textarea name="description" rows="3" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Τιμή (€)</label>
+                            <input type="number" step="0.01" name="price" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Εικόνα</label>
+                            <input type="file" name="image">
+                        </div>
+                        <button type="submit" class="btn-admin">Προσθήκη</button>
+                    </form>
+                </div>
+
+                <div>
+                    <div class="tabs">
+                        <a href="{{ url_for('admin_products', view='active') }}" class="tab-link {{ 'active' if view_mode == 'active' else '' }}">Ενεργά</a>
+                        <a href="{{ url_for('admin_products', view='trash') }}" class="tab-link {{ 'active' if view_mode == 'trash' else '' }}">Διεγραμμένα</a>
+                    </div>
+
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Εικόνα</th>
+                                <th>Όνομα</th>
+                                <th>Κατηγορία</th>
+                                <th>Τιμή</th>
+                                <th>Ενέργειες</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in products %}
+                            <tr>
+                                <td>
+                                    <img src="{{ url_for('static', filename='images/' + product.image_url) }}" class="table-img" onerror="this.src='/static/images/default.jpg'">
+                                </td>
+                                <td>{{ product.name }}</td>
+                                <td><span class="badge" style="background:#3498db">{{ product.category }}</span></td>
+                                <td>{{ product.price }} €</td>
+                                <td>
+                                    {% if product.active %}
+                                        <a href="{{ url_for('edit_product', product_id=product.id) }}" class="btn-icon edit"><i class="fas fa-edit"></i></a>
+                                        <a href="{{ url_for('delete_product', product_id=product.id) }}" class="btn-icon delete" onclick="return confirm('Σίγουρα;')"><i class="fas fa-trash"></i></a>
+                                    {% else %}
+                                        <a href="{{ url_for('restore_product', product_id=product.id) }}" class="btn-icon restore">♻️ Επαναφορά</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

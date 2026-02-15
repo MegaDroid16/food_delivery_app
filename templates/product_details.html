@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ product.name }} - Λεπτομέρειες</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <header>
+        <div class="nav-links">
+            <h1>🍔 Food Delivery</h1>
+            <a href="{{ url_for('index') }}">Αρχική</a>
+        </div>
+        <div class="nav-links">
+            <a href="{{ url_for('view_cart') }}" class="btn">🛒 Καλάθι</a>
+        </div>
+    </header>
+
+    <div class="product-details-container">
+        <a href="{{ url_for('index') }}" style="text-decoration: none; color: #555; display: inline-block; margin-bottom: 20px;">
+            ← Πίσω στο μενού
+        </a>
+
+        <div class="product-details-header">
+            <img src="{{ url_for('static', filename='images/' + product.image_url) }}" alt="{{ product.name }}" class="product-details-img">
+            
+            <div class="product-details-info">
+                <span class="product-category-badge">{{ product.category }}</span>
+                <h1>{{ product.name }}</h1>
+                <p style="font-size: 1.1em; color: #666;">{{ product.description }}</p>
+                
+                <div class="product-price-large">{{ product.price }} €</div>
+                
+                <button class="btn" onclick="addToCart('{{ product.id }}')" style="padding: 15px 30px; font-size: 1.2em;">
+                    Προσθήκη στο Καλάθι
+                </button>
+            </div>
+        </div>
+
+        <div class="reviews-section">
+            <h3>⭐ Κριτικές Πελατών</h3>
+            
+            {% if reviews %}
+                {% for review in reviews %}
+                <div class="review-card">
+                    <div class="review-header">
+                        <strong style="color: #2c3e50; font-size: 1.1em;">
+                            <i class="fas fa-user-circle"></i> {{ review.user.username }}
+                        </strong>
+                        <span>{{ review.created_at.strftime('%d/%m/%Y') }}</span>
+                    </div>
+                    <div style="margin: 5px 0;">
+                        {% for i in range(1, 6) %}
+                            <i class="fas fa-star {{ 'star-gold' if i <= review.rating else 'star-gray' }}"></i>
+                        {% endfor %}
+                    </div>
+                    <p style="margin-top: 10px; font-style: italic;">"{{ review.comment }}"</p>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p style="color: #777;">Δεν υπάρχουν ακόμη κριτικές. Γίνετε ο πρώτος!</p>
+            {% endif %}
+
+            {% if has_purchased %}
+            <div class="review-form-box">
+                <h4>✍️ Γράψτε την κριτική σας</h4>
+                <form action="{{ url_for('add_review', product_id=product.id) }}" method="POST">
+                    <div class="form-group">
+                        <label>Βαθμολογία:</label>
+                        <select name="rating" class="form-control" style="width: 100px;">
+                            <option value="5">5 ⭐⭐⭐⭐⭐</option>
+                            <option value="4">4 ⭐⭐⭐⭐</option>
+                            <option value="3">3 ⭐⭐⭐</option>
+                            <option value="2">2 ⭐⭐</option>
+                            <option value="1">1 ⭐</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Σχόλιο:</label>
+                        <textarea name="comment" rows="3" class="form-control" placeholder="Πείτε μας τη γνώμη σας..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn">Δημοσίευση</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function addToCart(productId) {
+            fetch('/add/' + productId, { method: 'POST' })
+            .then(response => response.json())
+            .then(data => alert('Το προϊόν προστέθηκε!'))
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+
+</body>
+</html>

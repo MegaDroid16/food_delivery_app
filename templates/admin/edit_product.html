@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <title>Επεξεργασία Προϊόντος</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+</head>
+<body>
+    <div style="max-width: 600px; margin: 50px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+        <h2>✏️ Επεξεργασία: {{ product.name }}</h2>
+        
+        <form action="{{ url_for('edit_product', product_id=product.id) }}" method="POST" enctype="multipart/form-data" class="admin-form">
+            <div class="form-group">
+                <label>Όνομα:</label>
+                <input type="text" name="name" value="{{ product.name }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Κατηγορία:</label>
+                <select name="category" style="width: 100%; padding: 10px;">
+                    <option value="Pizza" {{ 'selected' if product.category == 'Pizza' }}>Pizza🍕</option>
+                    <option value="Burgers" {{ 'selected' if product.category == 'Burgers' }}>Burgers🍔</option>
+                    <option value="Salads" {{ 'selected' if product.category == 'Salads' }}>Salads🥗</option>
+                    <option value="Drinks" {{ 'selected' if product.category == 'Drinks' }}>Drinks🍻</option>
+                    <option value="Snacks" {{ 'selected' if product.category == 'Snacks' }}>Sides🍟</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Περιγραφή:</label>
+                <textarea name="description" rows="4" required>{{ product.description }}</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Τιμή (€):</label>
+                <input type="number" step="0.01" name="price" value="{{ product.price }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Αλλαγή Εικόνας (προαιρετικό):</label>
+                <input type="file" name="image">
+                <p style="font-size: 0.8em; color: #666;">Τρέχουσα: {{ product.image_url }}</p>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button type="submit" class="btn-admin">💾 Αποθήκευση</button>
+                <a href="{{ url_for('admin_products') }}" style="display: block; width: 100%; text-align: center; padding: 10px; background: #95a5a6; color: white; text-decoration: none; border-radius: 4px;">Ακύρωση</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

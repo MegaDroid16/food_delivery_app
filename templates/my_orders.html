@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <title>Οι Παραγγελίες μου</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .badge { padding: 5px 10px; border-radius: 15px; color: white; font-size: 0.9em; }
+        .bg-pending { background-color: #f39c12; }
+        .bg-completed { background-color: #2ecc71; }
+        .bg-cancelled { background-color: #e74c3c; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="nav-links">
+            <h1>🍔 Food Delivery</h1>
+            <a href="{{ url_for('index') }}">Αρχική</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>📜 Το Ιστορικό μου</h2>
+
+        {% if orders %}
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Ημερομηνία</th>
+                        <th>Διεύθυνση</th>
+                        <th>Ποσό</th>
+                        <th>Τρόπος Πληρωμής</th>
+                        <th>Κατάσταση</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td>{{ order.customer_address }}</td>
+                        <td style="font-weight: bold;">{{ order.total_amount }} €</td>
+                        <td>{{ order.payment_method }}</td>
+                        <td>
+                            <span class="badge {{ 'bg-completed' if order.status == 'Completed' else 'bg-cancelled' if order.status == 'Cancelled' else 'bg-pending' }}">
+                                {{ order.status }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <div style="text-align: center; padding: 50px;">
+                <h3>Δεν έχετε κάνει ακόμη καμία παραγγελία.</h3>
+                <a href="{{ url_for('index') }}" class="btn">Δείτε το μενού</a>
+            </div>
+        {% endif %}
+    </div>
+
+</body>
+</html>

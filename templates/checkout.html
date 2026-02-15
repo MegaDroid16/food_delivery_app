@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <title>Ολοκλήρωση Παραγγελίας</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='checkout.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='cart.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <h1>📦 Ταμείο</h1>
+        <a href="{{ url_for('view_cart') }}">Πίσω στο Καλάθι</a>
+    </header>
+
+    <div class="container">
+        <div class="checkout-wrapper">
+            <div class="order-summary">
+                <h3>Σύνολο Πληρωμής</h3>
+                <div class="final-price">{{ total_cost }} €</div>
+                <p>Συμπεριλαμβάνεται ΦΠΑ</p>
+            </div>
+
+            <form action="{{ url_for('checkout') }}" method="POST" class="checkout-form" id="checkoutForm">
+            <h3>Στοιχεία Αποστολής</h3>
+            
+            <div class="form-group">
+                <label>Ονοματεπώνυμο</label>
+                <input type="text" name="name" required class="form-control" 
+                value="{{ user_info.full_name if user_info and user_info.full_name else '' }}" 
+                placeholder="Γιώργος Παπαδόπουλος">
+            </div>
+
+            <div class="form-group">
+                <label>Διεύθυνση</label>
+                <input type="text" name="address" required class="form-control" 
+                value="{{ user_info.address if user_info and user_info.address else '' }}" 
+                placeholder="Ερμού 15, Αθήνα">
+            </div>
+
+            <div class="form-group">
+                <label>Τηλέφωνο (10 ψηφία)</label>
+                <input type="tel" name="phone" required class="form-control" 
+                pattern="[0-9]{10}" 
+                title="Το τηλέφωνο πρέπει να αποτελείται από 10 ψηφία"
+                value="{{ user_info.phone if user_info and user_info.phone else '' }}" 
+                placeholder="6912345678">
+            </div>
+
+            <div class="form-group">
+                <label>Τρόπος Πληρωμής</label>
+                <select name="payment" id="paymentMethod" class="form-control" onchange="togglePaymentFields()">
+                    <option value="Cash">💵 Αντικαταβολή (Μετρητά)</option>
+                    <option value="Card">💳 Πιστωτική Κάρτα</option>
+                </select>
+            </div>
+
+            <div id="card-info" class="hidden-section">
+                <h4 style="margin-top: 20px; color: #2c3e50;">Στοιχεία Κάρτας</h4>
+                
+                <div class="form-group">
+                    <label>Αριθμός Κάρτας</label>
+                    <input type="text" name="card_number" id="card_number" class="form-control" 
+                        pattern="[0-9]{16}" placeholder="1234 5678 1234 5678">
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Ημ/νία Λήξης</label>
+                        <input type="text" name="card_expiry" id="card_expiry" class="form-control" 
+                            placeholder="MM/YY" pattern="(0[1-9]|1[0-2])\/[0-9]{2}">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>CVV</label>
+                        <input type="text" name="card_cvv" id="card_cvv" class="form-control" 
+                            pattern="[0-9]{3}" placeholder="123">
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-lg btn-block" style="margin-top: 20px;">Αποστολή Παραγγελίας ✅</button>
+        </form>
+        <script>
+            function togglePaymentFields() {
+                var paymentSelect = document.getElementById("paymentMethod");
+                var cardSection = document.getElementById("card-info");
+                
+                // Πεδία κάρτας για να βάζουμε/βγάζουμε το 'required'
+                var cNum = document.getElementById("card_number");
+                var cExp = document.getElementById("card_expiry");
+                var cCvv = document.getElementById("card_cvv");
+
+                if (paymentSelect.value === "Card") {
+                    cardSection.style.display = "block";
+                    // Τα κάνουμε υποχρεωτικά ΜΟΝΟ αν έχει επιλεγεί κάρτα
+                    cNum.required = true;
+                    cExp.required = true;
+                    cCvv.required = true;
+                } else {
+                    cardSection.style.display = "none";
+                    // Αν είναι μετρητά, δεν τα θέλουμε υποχρεωτικά
+                    cNum.required = false;
+                    cExp.required = false;
+                    cCvv.required = false;
+                    
+                    // Καθαρίζουμε και τις τιμές αν το μετανιώσει
+                    cNum.value = "";
+                    cExp.value = "";
+                    cCvv.value = "";
+                }
+            }
+            
+            // Τρέξτο μία φορά στην αρχή μήπως ο browser έχει κρατήσει την επιλογή
+            document.addEventListener("DOMContentLoaded", function() {
+                togglePaymentFields(); 
+            });
+        </script>
+        </div>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            
+            <div class="footer-col">
+                <h3>🍔 Food Delivery</h3>
+                <p>Το πιο νόστιμο φαγητό της πόλης, στην πόρτα σου με ένα κλικ. Γρήγορα, εύκολα και αξιόπιστα.</p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Μενού</h4>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Αρχική</a></li>
+                    <li><a href="{{ url_for('my_orders') }}">Ιστορικό Παραγγελιών</a></li>
+                    <li><a href="{{ url_for('profile') }}">Το Προφίλ μου</a></li>
+                    <li><a href="{{ url_for('view_cart') }}">Καλάθι</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Ακολουθήστε μας</h4>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+                <p style="margin-top: 15px; font-size: 0.9em;">📞 210-1234567</p>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            &copy; 2024 Food Delivery App. Created by You.
+        </div>
+    </footer>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+</body>
+</html>
+</body>
+</html>

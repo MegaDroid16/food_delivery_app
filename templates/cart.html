@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <title>Το Καλάθι μου</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='cart.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <header>
+        <div class="nav-links">
+            <h1>🍔 Food Delivery</h1>
+            <a href="{{ url_for('index') }}">Αρχική</a>
+        </div>
+        <div class="cart-summary">
+            🛒 Σύνολο: {{ total_cost }} €
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>Το Καλάθι σας</h2>
+        
+        {% if cart_items %}
+        <div class="table-responsive">
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>Προϊόν</th>
+                        <th>Τιμή Μονάδας</th>
+                        <th>Ποσότητα</th>
+                        <th>Υποσύνολο</th>
+                        <th>Ενέργειες</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                    <tr>
+                        <td class="product-info">
+                            <img src="{{ url_for('static', filename='images/' + item.info.image_url) }}" alt="img" class="cart-img" onerror="this.style.display='none'">
+                            <div>
+                                <strong>{{ item.info.name }}</strong>
+                                <br>
+                                <small>{{ item.info.description }}</small>
+                            </div>
+                        </td>
+                        <td>{{ item.info.price }} €</td>
+                        <td>
+                            <div class="quantity-controls">
+                                <a href="{{ url_for('update_cart', product_id=item.info.id, action='decrease') }}" class="qty-btn">-</a>
+                                
+                                <span class="qty-number">{{ item.quantity }}</span>
+                                
+                                <a href="{{ url_for('update_cart', product_id=item.info.id, action='increase') }}" class="qty-btn">+</a>
+                            </div>
+                        </td>
+                        <td>{{ item.subtotal }} €</td>
+                        <td>
+                            <a href="{{ url_for('remove_from_cart', product_id=item.info.id) }}" class="btn-remove">🗑️ Αφαίρεση</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="cart-actions">
+            <div class="totals-area">
+                <p>Υποσύνολο: <span id="subtotal">{{ total_cost }}</span> €</p>
+                
+               <div id="discount-row" class="{{ 'hidden' if discount_amount == 0 else 'discount-active' }}">
+    
+                    <div class="discount-wrapper">
+                        <span>
+                            Έκπτωση ({{ session['coupon']['code'] if 'coupon' in session else '' }}): 
+                            -<span id="discount-val">{{ discount_amount }}</span> €
+                        </span>
+                        
+                        <a href="{{ url_for('remove_coupon') }}" class="remove-coupon-btn" title="Αφαίρεση κουπονιού">✕</a>
+                    </div>
+
+                </div>
+                
+                <p class="total-label">Τελικό Σύνολο: <span class="total-price" id="final-total">{{ final_total if final_total else total_cost }}</span> €</p>
+            </div>
+            
+            <div class="coupon-section">
+                <input type="text" id="coupon_code" placeholder="Κωδικός Κουπονιού" class="form-control coupon-input">
+                <button onclick="applyCoupon()" class="btn btn-sm">Εφαρμογή</button>
+            </div>
+            <p id="coupon-msg" style="font-size: 0.9em; margin-top: 5px;"></p>
+            
+            <a href="{{ url_for('checkout') }}" class="btn btn-lg btn-block">Ολοκλήρωση Παραγγελίας &rarr;</a>
+        </div>
+
+        <script>
+        function applyCoupon() {
+            var code = document.getElementById('coupon_code').value;
+            
+            fetch('/apply_coupon', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: code })
+            })
+            .then(response => response.json())
+            .then(data => {
+                var msg = document.getElementById('coupon-msg');
+                if (data.success) {
+                    msg.style.color = 'green';
+                    msg.innerText = 'Το κουπόνι εφαρμόστηκε! -' + data.discount + '%';
+                    // Κάνουμε reload για να υπολογίσει η Python τα νέα νούμερα σωστά
+                    location.reload(); 
+                } else {
+                    msg.style.color = 'red';
+                    msg.innerText = data.message;
+                }
+            });
+        }
+        </script>
+
+        {% else %}
+            <div class="empty-state">
+                <h3>Το καλάθι σας είναι άδειο 😔</h3>
+                <a href="{{ url_for('index') }}" class="btn">Πάμε για φαγητό!</a>
+            </div>
+        {% endif %}
+    </div>
+<footer class="site-footer">
+        <div class="footer-container">
+            
+            <div class="footer-col">
+                <h3>🍔 Food Delivery</h3>
+                <p>Το πιο νόστιμο φαγητό της πόλης, στην πόρτα σου με ένα κλικ. Γρήγορα, εύκολα και αξιόπιστα.</p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Μενού</h4>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Αρχική</a></li>
+                    <li><a href="{{ url_for('my_orders') }}">Ιστορικό Παραγγελιών</a></li>
+                    <li><a href="{{ url_for('profile') }}">Το Προφίλ μου</a></li>
+                    <li><a href="{{ url_for('view_cart') }}">Καλάθι</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Ακολουθήστε μας</h4>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+                <p style="margin-top: 15px; font-size: 0.9em;">📞 210-1234567</p>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            &copy; 2024 Food Delivery App. Created by You.
+        </div>
+    </footer>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+</body>
+</html>
+</body>
+</html>

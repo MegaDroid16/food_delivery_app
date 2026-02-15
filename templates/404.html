@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <title>Η σελίδα δεν βρέθηκε - 404</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <header>
+        <div class="nav-links">
+            <h1>🍔 Food Delivery</h1>
+            <a href="{{ url_for('index') }}">Πίσω στο Μενού</a>
+        </div>
+    </header>
+
+    <div class="container" style="text-align: center; padding: 60px 20px;">
+        
+        <div class="error-icon" style="font-size: 80px; color: #e74c3c; margin-bottom: 20px;">
+            <i class="fas fa-pizza-slice"></i> 🧐
+        </div>
+
+        <h1 style="font-size: 3em; margin-bottom: 10px; color: #2c3e50;">Ωχ! 404</h1>
+        
+        <h2 style="color: #7f8c8d; margin-bottom: 30px;">
+            Φαίνεται πως αυτή η σελίδα... φαγώθηκε!
+        </h2>
+        
+        <p style="font-size: 1.2em; margin-bottom: 40px;">
+            Η διεύθυνση που ψάχνετε δεν υπάρχει ή μετακινήθηκε.<br>
+            Μην ανησυχείτε, το φαγητό είναι ασφαλές στην κουζίνα.
+        </p>
+
+        <a href="{{ url_for('index') }}" class="btn" style="padding: 15px 30px; font-size: 1.1em;">
+            🍕 Επιστροφή στο Μενού
+        </a>
+
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-col">
+                <h3>🍔 Food Delivery</h3>
+                <p>Το πιο νόστιμο φαγητό της πόλης.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Χρήσιμα Links</h4>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Αρχική</a></li>
+                    <li><a href="{{ url_for('view_cart') }}">Καλάθι</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Επικοινωνία</h4>
+                <p>📞 210-1234567</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2024 Food Delivery App.
+        </div>
+    </footer>
+
+</body>
+</html>

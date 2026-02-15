@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <title>Λεπτομέρειες Παραγγελίας #{{ order.id }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .order-container { max-width: 800px; margin: 40px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .header-flex { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
+        .customer-info { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .item-row { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .item-img { width: 60px; height: 60px; object-fit: cover; border-radius: 5px; margin-right: 20px; }
+        .item-details { flex: 1; }
+        .back-btn { text-decoration: none; color: #555; font-weight: bold; }
+        .back-btn:hover { color: #2c3e50; }
+    </style>
+</head>
+<body>
+
+    <div class="order-container">
+        <div class="header-flex">
+            <h2>📦 Παραγγελία #{{ order.id }}</h2>
+            <a href="{{ url_for('admin_orders') }}" class="back-btn">← Επιστροφή</a>
+        </div>
+
+        <div class="customer-info">
+            <h3>Στοιχεία Πελάτη</h3>
+            <p><strong>Όνομα:</strong> {{ order.customer_name }}</p>
+            <p><strong>Διεύθυνση:</strong> {{ order.customer_address }}</p>
+            <p><strong>Τηλέφωνο:</strong> {{ order.customer_phone }}</p>
+            <p><strong>Ημερομηνία:</strong> {{ order.created_at.strftime('%d/%m/%Y %H:%M') }}</p>
+            <p><strong>Status:</strong> 
+                <span class="badge {{ 'badge-success' if order.status == 'Completed' else 'badge-warning' }}">
+                    {{ order.status }}
+                </span>
+            </p>
+        </div>
+
+        <h3>Προϊόντα</h3>
+        <div>
+            {% for item in items %}
+            <div class="item-row">
+                <img 
+                    src="{{ url_for('static', filename='images/' + item.product.image_url) }}" 
+                    alt="Product Image" 
+                    class="item-img" 
+                    onerror="this.src='/static/images/default.jpg';"
+                >
+                
+                <div class="item-details">
+                    <h4 style="margin: 0;">{{ item.product.name }}</h4>
+                    <p style="margin: 5px 0; color: #777;">{{ item.product.category }}</p>
+                </div>
+                
+                <div style="text-align: right;">
+                    <div>{{ item.quantity }} x {{ item.price }} €</div>
+                    <div style="font-weight: bold;">{{ item.quantity * item.price }} €</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div style="text-align: right; margin-top: 30px; font-size: 1.5em; font-weight: bold; color: #2c3e50;">
+            Σύνολο: {{ order.total_amount }} €
+        </div>
+
+        <div style="margin-top: 40px; border-top: 2px solid #eee; padding-top: 20px;">
+            <h4>Ενημέρωση Κατάστασης:</h4>
+            <a href="{{ url_for('update_order_status', order_id=order.id, status='Pending') }}" class="btn-icon edit" style="text-decoration: none;">Pending</a>
+            <a href="{{ url_for('update_order_status', order_id=order.id, status='Completed') }}" class="btn-icon check" style="text-decoration: none;">Completed</a>
+            <a href="{{ url_for('update_order_status', order_id=order.id, status='Cancelled') }}" class="btn-icon delete" style="text-decoration: none;">Cancelled</a>
+        </div>
+    </div>
+
+</body>
+</html>

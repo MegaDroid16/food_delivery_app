@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <title>Food Delivery App</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        .spa-loader { text-align: center; padding: 20px; font-size: 1.2em; color: #666; }
+        /* Μικρή ρύθμιση για να ταιριάζει το στυλ του Search bar του Vue με το κλασικό */
+        .search-input { width: 100%; border: none; outline: none; font-size: 1em; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="nav-links">
+            <h1>🍔 Food Delivery</h1>
+        </div>
+
+        <div class="nav-links">
+            {% if session.get('username') %}
+                <span>Γεια σου, {{ session['username'] }}!</span>
+                <a href="{{ url_for('my_orders') }}" style="color: #ffeaa7; margin-left: 10px; text-decoration: none;">
+                    📜 Ιστορικό
+                </a>
+                <a href="{{ url_for('profile') }}" style="color: white; margin-left: 10px;">
+                    👤 Προφίλ
+                </a>
+                
+                {% if session.get('role') == 'admin' %}
+                    <a href="{{ url_for('admin_dashboard') }}" style="color: #ffdd57; margin-left: 10px; font-weight: bold;">⚙️ Admin Panel</a>
+                {% endif %}              
+                <a href="{{ url_for('logout') }}" style="color: white; margin-left: 10px;">Έξοδος</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" style="color: white; margin-right: 10px;">Σύνδεση</a>
+                <a href="{{ url_for('register') }}" style="color: white;">Εγγραφή</a>
+            {% endif %}
+        </div>
+
+        <div class="cart-section">
+            <a href="{{ url_for('view_cart') }}" style="color: white; text-decoration: none; display: flex; align-items: center; gap: 10px;">
+                <div class="cart-icon">
+                    🛒 Καλάθι
+                </div>
+            </a>
+        </div>
+    </header>
+
+    <div class="carousel-container">
+        <div class="carousel-slide">
+            <div class="slide fade">
+                <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Pizza Offer">
+                <div class="text-overlay">
+                    <h2>🍕 Pizza Night!</h2>
+                    <p>Κάθε Τρίτη όλες οι πίτσες -20%</p>
+                </div>
+            </div>
+
+            <div class="slide fade">
+                <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Burger Offer">
+                <div class="text-overlay">
+                    <h2>🍔 Burger Deal</h2>
+                    <p>Δοκίμασε το νέο XXL Burger!</p>
+                </div>
+            </div>
+
+            <div class="slide fade">
+                <img src="https://images.unsplash.com/photo-1550989460-0adf9ea622e2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Delivery">
+                <div class="text-overlay">
+                    <h2>🚀 Γρήγορη Παράδοση</h2>
+                    <p>Στην πόρτα σου σε 30' λεπτά.</p>
+                </div>
+            </div>
+
+            <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+            <a class="next" onclick="plusSlides(1)">&#10095;</a>
+        </div>
+        
+        <div style="text-align:center; margin-top: 10px;">
+            <span class="dot" onclick="currentSlide(1)"></span> 
+            <span class="dot" onclick="currentSlide(2)"></span> 
+            <span class="dot" onclick="currentSlide(3)"></span> 
+        </div>
+    </div>
+
+    <div id="app" class="container">
+        
+        <div class="search-wrapper" style="margin-top: 20px;">
+            <div class="search-form">
+                <input type="text" v-model="searchQuery" placeholder="Τι τραβάει η όρεξή σου;" class="search-input">
+                <button class="search-btn">🔍</button>
+            </div>
+        </div>
+
+        <div class="categories-bar">
+            <button @click="filterCategory('')" :class="['cat-btn', { active: selectedCategory === '' }]">Όλα</button>
+            <button @click="filterCategory('Pizza')" :class="['cat-btn', { active: selectedCategory === 'Pizza' }]">Pizza</button>
+            <button @click="filterCategory('Burgers')" :class="['cat-btn', { active: selectedCategory === 'Burgers' }]">Burgers</button>
+            <button @click="filterCategory('Drinks')" :class="['cat-btn', { active: selectedCategory === 'Drinks' }]">Drinks</button>
+             <button @click="filterCategory('Snacks')" :class="['cat-btn', { active: selectedCategory === 'Snacks' }]">Snacks</button>
+        </div>
+
+        <div v-if="loading" class="spa-loader">
+            <i class="fas fa-spinner fa-spin"></i> Φόρτωση μενού...
+        </div>
+
+        <div class="product-grid" v-else>
+            <div v-for="product in filteredProducts" :key="product.id" class="product-card">
+                
+                <a :href="'/product/' + product.id" class="card-img-link">
+                    <img :src="'/static/images/' + product.image_url" :alt="product.name">
+                </a>
+                
+                <div class="product-info">
+                    <h3>
+                        <a :href="'/product/' + product.id" class="card-title-link">
+                            [[ product.name ]]
+                        </a>
+                    </h3>
+                    
+                    <p>[[ product.description ]]</p>
+                    <div class="price">[[ product.price ]] €</div>
+                    
+                    <button class="btn" @click="addToCart(product.id)">
+                        Προσθήκη στο Καλάθι
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-col">
+                <h3>🍔 Food Delivery</h3>
+                <p>Το πιο νόστιμο φαγητό της πόλης, στην πόρτα σου με ένα κλικ.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Μενού</h4>
+                <ul>
+                    <li><a href="{{ url_for('classic_index') }}">Κλασική Έκδοση</a></li>
+                    <li><a href="{{ url_for('my_orders') }}">Ιστορικό</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2024 Food Delivery App.
+        </div>
+    </footer>
+
+    <script>
+        // --- 1. Carousel Logic (Vanilla JS) ---
+        let slideIndex = 1;
+        let slideTimer;
+
+        showSlides(slideIndex);
+
+        function plusSlides(n) {
+            clearTimeout(slideTimer);
+            showSlides(slideIndex += n);
+        }
+
+        function currentSlide(n) {
+            clearTimeout(slideTimer);
+            showSlides(slideIndex = n);
+        }
+
+        function showSlides(n) {
+            let i;
+            let slides = document.getElementsByClassName("slide");
+            let dots = document.getElementsByClassName("dot");
+            if (n > slides.length) {slideIndex = 1}    
+            if (n < 1) {slideIndex = slides.length}
+            for (i = 0; i < slides.length; i++) {
+                slides[i].style.display = "none";  
+            }
+            for (i = 0; i < dots.length; i++) {
+                dots[i].className = dots[i].className.replace(" active", "");
+            }
+            slides[slideIndex-1].style.display = "block";  
+            dots[slideIndex-1].className += " active";
+            slideTimer = setTimeout(() => { showSlides(slideIndex += 1); }, 4000); 
+        }
+
+        // --- 2. Vue.js Application ---
+        const { createApp } = Vue
+
+        createApp({
+            compilerOptions: {
+                delimiters: ['[[', ']]']
+            },
+            data() {
+                return {
+                    products: [],
+                    loading: false,
+                    searchQuery: '',
+                    selectedCategory: ''
+                }
+            },
+            computed: {
+                filteredProducts() {
+                    return this.products.filter(p => {
+                        const matchesSearch = p.name.toLowerCase().includes(this.searchQuery.toLowerCase());
+                        const matchesCat = this.selectedCategory === '' || p.category === this.selectedCategory;
+                        return matchesSearch && matchesCat;
+                    });
+                }
+            },
+            methods: {
+                async fetchProducts() {
+                    this.loading = true;
+                    try {
+                        const response = await fetch('/api/products');
+                        this.products = await response.json();
+                    } catch (error) {
+                        console.error('Error:', error);
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+                filterCategory(cat) {
+                    this.selectedCategory = cat;
+                },
+                async addToCart(productId) {
+                    try {
+                        const response = await fetch('/add/' + productId, { method: 'POST' });
+                        const data = await response.json();
+                        alert('Το προϊόν προστέθηκε! (Σύνολο στο καλάθι: ' + data.count + ')');
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                }
+            },
+            mounted() {
+                this.fetchProducts();
+            }
+        }).mount('#app')
+    </script>
+
+</body>
+</html>

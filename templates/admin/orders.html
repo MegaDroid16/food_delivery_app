@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <title>Διαχείριση Παραγγελιών</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="admin-wrapper">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h3>Admin Panel</h3>
+            </div>
+            <ul>
+                <li><a href="{{ url_for('admin_dashboard') }}">📊 Dashboard</a></li>
+                <li><a href="{{ url_for('admin_products') }}">🍔 Προϊόντα</a></li>
+                <li><a href="{{ url_for('admin_orders') }}" style="background: #34495e;">📦 Παραγγελίες</a></li>
+                <li><a href="{{ url_for('index') }}">🏠 Επιστροφή στο sitev</a></li>
+            </ul>
+        </nav>
+
+        <div class="content">
+            <h2>📦 Όλες οι Παραγγελίες</h2>
+
+            <table class="admin-table" style="margin-top: 20px;">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Πελάτης</th>
+                        <th>Ημερομηνία</th>
+                        <th>Ποσό</th>
+                        <th>Status</th>
+                        <th>Ενέργειες</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>#{{ order.id }}</td>
+                        <td>
+                            <strong>{{ order.customer_name }}</strong><br>
+                            <small>{{ order.customer_phone }}</small>
+                        </td>
+                        <td>{{ order.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td>{{ order.total_amount }} €</td>
+                        <td>
+                            <span class="badge {{ 'badge-success' if order.status == 'Completed' else 'badge-danger' if order.status == 'Cancelled' else 'badge-warning' }}">
+                                {{ order.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('view_order', order_id=order.id) }}"style="text-decoration: none;" class="btn-icon view">
+                                👁️ 
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>

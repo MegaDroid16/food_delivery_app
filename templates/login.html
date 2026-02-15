@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <title>Σύνδεση</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='auth.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='cart.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="auth-container">
+        <form method="POST" class="auth-form">
+            <h2>Σύνδεση</h2>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label>Κωδικός</label>
+                <input type="password" name="password" required>
+            </div>
+            
+            <button type="submit" class="btn btn-block">Είσοδος</button>
+            <p style="margin-top: 10px;">Νέος χρήστης; <a href="{{ url_for('register') }}">Εγγραφή</a></p>
+        </form>
+    </div>
+    <footer class="site-footer">
+        <div class="footer-container">
+            
+            <div class="footer-col">
+                <h3>🍔 Food Delivery</h3>
+                <p>Το πιο νόστιμο φαγητό της πόλης, στην πόρτα σου με ένα κλικ. Γρήγορα, εύκολα και αξιόπιστα.</p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Μενού</h4>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Αρχική</a></li>
+                    <li><a href="{{ url_for('my_orders') }}">Ιστορικό Παραγγελιών</a></li>
+                    <li><a href="{{ url_for('profile') }}">Το Προφίλ μου</a></li>
+                    <li><a href="{{ url_for('view_cart') }}">Καλάθι</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Ακολουθήστε μας</h4>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+                <p style="margin-top: 15px; font-size: 0.9em;">📞 210-1234567</p>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            &copy; 2024 Food Delivery App. Created by You.
+        </div>
+    </footer>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+</body>
+</html>
+</body>
+</html>

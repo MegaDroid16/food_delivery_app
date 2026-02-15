@@ -1,0 +1,174 @@
+/* --- Cart Specific Styles --- */
+
+.cart-summary {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.cart-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.cart-table th, .cart-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.text-muted {
+    color: #7f8c8d;
+    font-size: 0.9em;
+}
+
+.qty-badge {
+    font-weight: bold;
+    font-size: 1.2em;
+    background: #ecf0f1;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+.cart-actions {
+    margin-top: 30px;
+    text-align: right;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+}
+
+.total-label {
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.total-price {
+    color: var(--primary-color);
+}
+
+.coupon-section {
+    margin: 20px 0;
+    display: inline-flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.coupon-input {
+    width: 200px; /* Specific width for coupon */
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+}
+
+.btn-lg {
+    font-size: 1.2rem;
+    padding: 12px 30px;
+}
+
+/* static/cart.css */
+
+/* Μικρογραφία εικόνας στο καλάθι */
+.cart-img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+.product-info {
+    display: flex;
+    align-items: center;
+}
+
+/* Controls για την ποσότητα (+ / -) */
+.quantity-controls {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.qty-btn {
+    display: inline-block;
+    padding: 5px 12px;
+    background-color: #f1f1f1;
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+.qty-btn:hover {
+    background-color: #ddd;
+}
+
+.qty-number {
+    padding: 0 10px;
+    font-weight: bold;
+    min-width: 20px;
+    text-align: center;
+}
+
+/* Κουμπί Διαγραφής */
+.btn-remove {
+    display: inline-block;
+    color: #e74c3c;
+    text-decoration: none;
+    font-size: 0.9em;
+    padding: 5px 10px;
+    border: 1px solid #e74c3c;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.btn-remove:hover {
+    background-color: #e74c3c;
+    color: white;
+}
+
+
+.discount-active {
+    color: #2ecc71; /* Το πράσινο χρώμα */
+    display: block;
+}
+
+.hidden {
+    display: none; /* Κρύβει το στοιχείο */
+}
+
+/* static/cart.css */
+
+.remove-coupon-btn {
+    color: #e74c3c; /* Κόκκινο */
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.1em;
+    padding: 0 5px;
+    cursor: pointer;
+    transition: color 0.2s;
+    margin-left: 10px;
+}
+
+.remove-coupon-btn:hover {
+    color: #c0392b; /* Πιο σκούρο κόκκινο στο hover */
+    background-color: #ffecec;
+    border-radius: 50%;
+}
+
+.discount-wrapper {
+    display: flex;
+    justify-content: flex-end; /* Σπρώχνει τα περιεχόμενα τέρμα δεξιά */
+    align-items: center;       /* Κεντράρει κάθετα το κείμενο με το κουμπί */
+    gap: 10px;                 /* Ένα μικρό κενό ανάμεσα στο ποσό και το 'X' */
+    margin-bottom: 5px;        /* Λίγος αέρας από κάτω */
+}

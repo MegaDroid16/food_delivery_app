@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Delivery App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='cart.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <header>
+        <div class="nav-links">
+            <h1>🍔 Food Delivery</h1>
+        </div>
+
+        <div class="nav-links">
+            {% if session.get('username') %}
+                <span>Γεια σου, {{ session['username'] }}!</span>
+                <a href="{{ url_for('my_orders') }}" style="color: #ffeaa7; margin-left: 10px; text-decoration: underline;">
+                    📜 Ιστορικό
+                </a>
+                <a href="{{ url_for('profile') }}" style="color: white; margin-left: 10px;">
+                    👤 Προφίλ
+                </a>
+                
+                {% if session.get('role') == 'admin' %}
+                    <a href="{{ url_for('admin_dashboard') }}" style="color: #ffdd57; margin-left: 10px; font-weight: bold;">⚙️ Admin Panel</a>
+                {% endif %}              
+                <a href="{{ url_for('logout') }}" style="color: white; margin-left: 10px;">Έξοδος</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" style="color: white; margin-right: 10px;">Σύνδεση</a>
+                <a href="{{ url_for('register') }}" style="color: white;">Εγγραφή</a>
+            {% endif %}
+        </div>
+
+        <div class="cart-section" style="display: flex; align-items: center; gap: 15px;">
+            <div class="cart-icon">
+                🛒 Καλάθι: <span id="cart-count">{{ session['cart'].values()|sum if 'cart' in session else 0 }}</span>
+            </div>
+            <a href="{{ url_for('view_cart') }}" style="color: white; font-size: 0.9em; text-decoration: underline;">Προβολή</a>
+        </div>
+    </header>
+
+    <div class="carousel-container">
+        <div class="carousel-slide">
+            <div class="slide fade">
+                <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Pizza Offer">
+                <div class="text-overlay">
+                    <h2>🍕 Pizza Night!</h2>
+                    <p>Κάθε Τρίτη όλες οι πίτσες -20%</p>
+                </div>
+            </div>
+
+            <div class="slide fade">
+                <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Burger Offer">
+                <div class="text-overlay">
+                    <h2>🍔 Burger Deal</h2>
+                    <p>Δοκίμασε το νέο XXL Burger!</p>
+                </div>
+            </div>
+
+            <div class="slide fade">
+                <img src="https://images.unsplash.com/photo-1550989460-0adf9ea622e2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Delivery">
+                <div class="text-overlay">
+                    <h2>🚀 Γρήγορη Παράδοση</h2>
+                    <p>Στην πόρτα σου σε 30' λεπτά.</p>
+                </div>
+            </div>
+
+            <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+            <a class="next" onclick="plusSlides(1)">&#10095;</a>
+        </div>
+        
+        <div style="text-align:center; margin-top: 10px;">
+            <span class="dot" onclick="currentSlide(1)"></span> 
+            <span class="dot" onclick="currentSlide(2)"></span> 
+            <span class="dot" onclick="currentSlide(3)"></span> 
+        </div>
+    </div>
+
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}" style="margin-bottom: 20px; padding: 10px; border-radius: 5px; background: #d4edda; color: #155724;">
+                  {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <!-- <h2>Το Μενού μας</h2> -->
+
+        <div class="search-wrapper">
+            <form action="{{ url_for('index') }}" method="GET" class="search-form">
+                {% if active_category %}
+                    <input type="hidden" name="category" value="{{ active_category }}">
+                {% endif %}
+                
+                <input type="text" name="q" placeholder="Τι τραβάει η όρεξή σου;" 
+                    value="{{ search_query if search_query else '' }}" class="search-input">
+                
+                <button type="submit" class="search-btn">🔍 Αναζήτηση</button>
+                
+                {% if search_query %}
+                    <a href="{{ url_for('index', category=active_category) }}" class="clear-search">✕</a>
+                {% endif %}
+            </form>
+        </div>
+        
+        <div class="categories-bar">
+            <a href="{{ url_for('index') }}" class="cat-btn {{ 'active' if not active_category else '' }}">Όλα</a>
+            
+            {% for cat in categories %}
+                <a href="{{ url_for('index', category=cat.category) }}" 
+                class="cat-btn {{ 'active' if active_category == cat.category else '' }}">
+                {{ cat.category }}
+                </a>
+            {% endfor %}
+        </div>
+        
+        <div class="product-grid">
+            {% for product in products %}
+            <div class="product-card">
+                
+                <a href="{{ url_for('product_details', product_id=product.id) }}" class="card-img-link">
+                    <img src="{{ url_for('static', filename='images/' + product.image_url) }}" alt="{{ product.name }}">
+                </a>
+                
+                <div class="product-info">
+                    <h3>
+                        <a href="{{ url_for('product_details', product_id=product.id) }}" class="card-title-link">
+                            {{ product.name }}
+                        </a>
+                    </h3>
+                    
+                    <p>{{ product.description }}</p>
+                    <div class="price">{{ product.price }} €</div>
+                    
+                    <button class="btn" onclick="addToCart('{{ product.id }}')">Προσθήκη στο Καλάθι</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        function addToCart(productId) {
+            fetch('/add/' + productId, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Τώρα αυτό θα δουλέψει γιατί επαναφέραμε το id="cart-count"
+                document.getElementById('cart-count').innerText = data.count;
+                alert('Το προϊόν προστέθηκε!');
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+    <footer class="site-footer">
+        <div class="footer-container">
+            
+            <div class="footer-col">
+                <h3>🍔 Food Delivery</h3>
+                <p>Το πιο νόστιμο φαγητό της πόλης, στην πόρτα σου με ένα κλικ. Γρήγορα, εύκολα και αξιόπιστα.</p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Μενού</h4>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Αρχική</a></li>
+                    <li><a href="{{ url_for('my_orders') }}">Ιστορικό Παραγγελιών</a></li>
+                    <li><a href="{{ url_for('profile') }}">Το Προφίλ μου</a></li>
+                    <li><a href="{{ url_for('view_cart') }}">Καλάθι</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Ακολουθήστε μας</h4>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                </div>
+                <p style="margin-top: 15px; font-size: 0.9em;">📞 210-1234567</p>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            &copy; 2024 Food Delivery App. Created by You.
+        </div>
+    </footer>
+
+    
+<script>
+    let slideIndex = 1;
+    let slideTimer; // Για να σταματάει όταν πατάμε κουμπί
+
+    showSlides(slideIndex);
+
+    // Επόμενο/Προηγούμενο
+    function plusSlides(n) {
+        clearTimeout(slideTimer); // Reset το χρονόμετρο αν πατήσει ο χρήστης
+        showSlides(slideIndex += n);
+    }
+
+    // Επιλογή με τελεία
+    function currentSlide(n) {
+        clearTimeout(slideTimer);
+        showSlides(slideIndex = n);
+    }
+
+    function showSlides(n) {
+        let i;
+        let slides = document.getElementsByClassName("slide");
+        let dots = document.getElementsByClassName("dot");
+        
+        if (n > slides.length) {slideIndex = 1}    
+        if (n < 1) {slideIndex = slides.length}
+        
+        // Κρύψε όλα τα slides
+        for (i = 0; i < slides.length; i++) {
+            slides[i].style.display = "none";  
+        }
+        
+        // Αφαίρεσε το "active" από όλες τις τελείες
+        for (i = 0; i < dots.length; i++) {
+            dots[i].className = dots[i].className.replace(" active", "");
+        }
+        
+        // Εμφάνισε το τρέχον slide
+        slides[slideIndex-1].style.display = "block";  
+        dots[slideIndex-1].className += " active";
+
+        // Αυτόματη αλλαγή μετά από 4 δευτερόλεπτα
+        slideTimer = setTimeout(() => {
+            showSlides(slideIndex += 1);
+        }, 4000); 
+    }
+</script>
+</body>
+</html>

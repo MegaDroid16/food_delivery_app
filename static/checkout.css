@@ -1,0 +1,65 @@
+.checkout-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 40px;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.order-summary {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    height: fit-content;
+}
+
+.final-price {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #2ecc71;
+    margin: 10px 0;
+}
+
+.checkout-form h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #2c3e50;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+/* Responsive για κινητά */
+@media (max-width: 768px) {
+    .checkout-wrapper {
+        grid-template-columns: 1fr;
+    }
+    .order-summary {
+        margin-bottom: 20px;
+    }
+}
+
+.hidden-section {
+    display: none; /* Κρυμμένο από προεπιλογή */
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    margin-top: 15px;
+    animation: fadeIn 0.5s;
+}
+
+/* Ένα ωραίο εφέ εμφάνισης */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
